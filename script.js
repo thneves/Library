@@ -1,5 +1,3 @@
-let books = (() => {
-
   // Public functions
 
   const listCon = document.getElementById('book-list-con');
@@ -7,15 +5,20 @@ let books = (() => {
   const form = document.querySelector('form');
   let myLibraryArr = [];
   
-  let create = (title, author, pages, status) => {
-    return {title, author, pages, status};
-  };
 
+  class Book {
+    constructor(title, author, pages, status) {
+      this.title = title;
+      this.author = author;
+      this.pages = pages;
+      this.status = status;
+    }
+  }
 
-  let booksFromStorage = () => {
-    localStorage.setItem('myLibraryStorage', JSON.stringify(myLibraryArr));
-    myLibraryArr = JSON.parse(localStorage.getItem('myLibraryStorage'));
-    printBooks(myLibraryArr);
+  let booksFromStorage = (arr) => {
+    localStorage.setItem('myLibraryStorage', JSON.stringify(arr));
+    arr = JSON.parse(localStorage.getItem('myLibraryStorage'));
+    printBooks(arr);
   }
 
   let addToLibrary = (e) => {
@@ -25,9 +28,9 @@ let books = (() => {
     const pages = document.getElementById('pages');
     const status = document.getElementById('status');
 
-    const book  = books.create(title.value, author.value, pages.value, status.value);
+    const book = new Book(title.value, author.value, pages.value, status.value);
     myLibraryArr.push(book);
-    books.booksFromStorage();
+    booksFromStorage(myLibraryArr);
     form.reset();
     form.classList.toggle('d-none');
   };
@@ -40,7 +43,7 @@ let books = (() => {
         } else {
           book.status = 'I read it!';
         }
-        books.booksFromStorage();
+        booksFromStorage(myLibraryArr);
       }
     });
   };
@@ -85,27 +88,23 @@ let books = (() => {
     printBooks(myLibraryArr);
   }
 
-  return {create, myLibraryArr, addToLibrary, listCon, removeBook, addBtn, form, changeStatus, booksFromStorage};
-  
-})();
-
 // Events
 
-books.listCon.addEventListener('click', (e) => {
+listCon.addEventListener('click', (e) => {
   if (e.target.classList.contains('status-btn')) {
-   books.changeStatus(e.target.textContent, e.target.parentElement.firstChild.nextElementSibling.textContent);
+   changeStatus(e.target.textContent, e.target.parentElement.firstChild.nextElementSibling.textContent);
   } 
 });
 
-books.listCon.addEventListener('click', (e) => {
+listCon.addEventListener('click', (e) => {
   if (e.target.classList.contains('delete-btn')) {
-   books.removeBook(e.target.parentElement.firstChild.nextElementSibling.textContent);
+   removeBook(e.target.parentElement.firstChild.nextElementSibling.textContent);
    e.target.parentElement.parentElement.remove(); 
  }
 });
 
-books.addBtn.addEventListener('click', () => {
-  books.form.classList.toggle('d-none');
+addBtn.addEventListener('click', () => {
+  form.classList.toggle('d-none');
  });
 
- books.form.addEventListener('submit', books.addToLibrary);
+ form.addEventListener('submit', addToLibrary);
